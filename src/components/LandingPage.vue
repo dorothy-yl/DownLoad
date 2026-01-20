@@ -10,9 +10,28 @@
         </div>
         <div class="nav-links">
         </div>
-        <button class="download-btn">下载</button>
+        <div class="nav-actions">
+          <!-- 语言切换按钮 -->
+          <button class="language-btn" @click="toggleLanguage" :title="t.switchTo">
+            {{ t.language }}
+          </button>
+          <button class="download-btn">{{ t.download }}</button>
+        </div>
       </div>
     </nav>
+
+    <!-- 引导提示条 -->
+    <div 
+      v-if="showGuideTip && (isMobile || isTablet)" 
+      class="guide-tip"
+      :style="guideTipStyle"
+      @click="closeGuideTip"
+    >
+      <div class="guide-tip-content">
+        <span class="guide-tip-text">{{ t.guideTip }}</span>
+        <img src="@/image/不规则箭头-右上.svg" alt="arrow" class="guide-tip-arrow" />
+      </div>
+    </div>
 
     <!-- 主内容区域 -->
     <div class="main-content">
@@ -21,50 +40,188 @@
      
         <!-- 标题 -->
         <h1 class="headline">
-          <span class="headline-part-1">智能健身,</span>
-          <span class="headline-part-2">科学训练</span>
+          <span class="headline-part-2">{{ t.headline }}</span>
         </h1>
 
         <!-- 描述文字 -->
         <p class="description">
-          I-consolePro 是您的私人健身教练,通过AI技术为您提供个性化训练计划,实时数据监测,让健身更高效、更有趣。
+          {{ t.description }}
         </p>
 
+
+    
         <!-- 下载渠道列表 -->
         <div class="download-channels">
-          <h3 class="channels-title">下载方式</h3>
+          <h3 class="channels-title">{{ t.downloadOptions }}</h3>
           <div class="channels-grid">
-            <a href="#" class="channel-item" title="应用宝">
-              <img src="@/image/应用宝.svg" alt="应用宝" />
+            <a 
+              href="#" 
+              class="channel-item" 
+              :title="t.yingyongbao"
+              :ref="el => setChannelRef(el, 'yingyongbao')"
+              @click.prevent="handleChannelClick('yingyongbao', $event)"
+            >
+              <img src="@/image/应用宝.svg" :alt="t.yingyongbao" />
+              <span class="channel-text">{{ t.yingyongbao }}</span>
             </a>
-            <a href="#" class="channel-item" title="小米商城">
-              <img src="@/image/小米.svg" alt="小米商城" />
+            <a 
+              href="#" 
+              class="channel-item" 
+              :title="t.xiaomi"
+              :ref="el => setChannelRef(el, 'xiaomi')"
+              @click.prevent="handleChannelClick('xiaomi', $event)"
+            >
+              <img src="@/image/小米.svg" :alt="t.xiaomi" />
+               <span class="channel-text">{{ t.xiaomi }}</span>
             </a>
-            <a href="#" class="channel-item" title="华为">
-              <img src="@/image/华为.svg" alt="华为" />
-            </a>
+            <a 
+              href="#" 
+              class="channel-item" 
+              :title="t.huawei"
+              :ref="el => setChannelRef(el, 'huawei')"
+              @click.prevent="handleChannelClick('huawei', $event)"
+            >
+              <img src="@/image/华为.svg" :alt="t.huawei" />
+              <span class="channel-text">{{ t.huawei }}</span>
+             </a>
            
-            <a href="#" class="channel-item" title="Google Play">
-              <img src="@/image/谷歌.svg" alt="Google Play" />
+            <a 
+              href="#" 
+              class="channel-item" 
+              :title="t.google"
+              :ref="el => setChannelRef(el, 'google')"
+              @click.prevent="handleChannelClick('google', $event)"
+            >
+              <img src="@/image/谷歌.svg" :alt="t.google" />
+               <span class="channel-text">{{ t.google }}</span>
             </a>
-            <a href="#" class="channel-item" title="三星">
-              <img src="@/image/三星.svg" alt="三星" />
+            <a 
+              href="#" 
+              class="channel-item" 
+              :title="t.samsung"
+              :ref="el => setChannelRef(el, 'samsung')"
+              @click.prevent="handleChannelClick('samsung', $event)"
+            >
+              <img src="@/image/三星.svg" :alt="t.samsung" />
+               <span class="channel-text">{{ t.samsung }}</span>
             </a>
             
           </div>
         </div>
       </div>
 
-      <!-- 右侧手机展示 -->
-      <div class="right-section">
-        <img src="@/image/phone_mockup.png" alt="I-consolePro App" class="phone-mockup" />
-      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-// Vue 3 Script Setup - 无需额外导入
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { translations, getLanguage, setLanguage, getTranslation } from '@/utils/i18n.js'
+
+// 当前语言状态
+const currentLang = ref('zh')
+
+// 计算属性：获取当前语言的翻译对象
+const t = computed(() => {
+  return translations[currentLang.value] || translations.zh
+})
+
+// 切换语言函数
+const toggleLanguage = () => {
+  currentLang.value = currentLang.value === 'zh' ? 'en' : 'zh'
+  setLanguage(currentLang.value)
+}
+
+// 响应式判断
+const windowWidth = ref(window.innerWidth)
+const isMobile = computed(() => windowWidth.value < 768)
+const isTablet = computed(() => windowWidth.value >= 768 && windowWidth.value < 1024)
+const isDesktop = computed(() => windowWidth.value >= 1024)
+
+// 提示条相关状态
+const showGuideTip = ref(false)
+const guideTipStyle = ref({})
+const autoHideTimer = ref(null)
+const channelRefs = ref({})
+
+// 设置渠道按钮引用
+const setChannelRef = (el, channelName) => {
+  if (el) {
+    channelRefs.value[channelName] = el
+  }
+}
+
+// 处理渠道按钮点击
+const handleChannelClick = async (channelName, event) => {
+  // 仅在手机端和平板端显示提示条
+  if (!isMobile.value && !isTablet.value) {
+    return
+  }
+
+  // 清除之前的定时器
+  if (autoHideTimer.value) {
+    clearTimeout(autoHideTimer.value)
+    autoHideTimer.value = null
+  }
+
+  // 等待 DOM 更新后更新提示条位置
+  await nextTick()
+  updateGuideTipPosition()
+
+  // 显示提示条
+  showGuideTip.value = true
+
+  // 5秒后自动隐藏
+  autoHideTimer.value = setTimeout(() => {
+    showGuideTip.value = false
+    autoHideTimer.value = null
+  }, 5000)
+}
+
+// 更新提示条位置 - 固定在导航栏下方
+const updateGuideTipPosition = () => {
+  const navbarHeight = document.querySelector('.navbar')?.offsetHeight || 0
+  
+  // 提示条始终固定在导航栏下方
+  guideTipStyle.value = {
+    top: `${navbarHeight}px`
+  }
+}
+
+// 手动关闭提示条
+const closeGuideTip = () => {
+  showGuideTip.value = false
+  if (autoHideTimer.value) {
+    clearTimeout(autoHideTimer.value)
+    autoHideTimer.value = null
+  }
+}
+
+// 监听窗口大小变化
+const handleResize = () => {
+  windowWidth.value = window.innerWidth
+  // 如果是桌面端，隐藏提示条
+  if (isDesktop.value) {
+    closeGuideTip()
+  } else if (showGuideTip.value) {
+    // 如果提示条正在显示，更新位置以适应导航栏高度变化
+    updateGuideTipPosition()
+  }
+}
+
+// 组件挂载时从 localStorage 读取语言设置
+onMounted(() => {
+  currentLang.value = getLanguage()
+  window.addEventListener('resize', handleResize)
+})
+
+// 组件卸载时清理
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+  if (autoHideTimer.value) {
+    clearTimeout(autoHideTimer.value)
+  }
+})
 </script>
 
 <style scoped>
@@ -113,6 +270,34 @@
   color: #1890ff;
 }
 
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+}
+
+.language-btn {
+  padding: 0.5rem 1.2rem;
+  border: 2px solid #666;
+  border-radius: 25px;
+  background: transparent;
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  min-width: 70px;
+}
+
+.language-btn:hover {
+  border-color: #1890ff;
+  color: #1890ff;
+  background: rgba(24, 144, 255, 0.05);
+  transform: translateY(-2px);
+}
+
 .download-btn {
   padding: 0.5rem 1.5rem;
   border: 2px solid #1890ff;
@@ -123,7 +308,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-left: auto;
+  white-space: nowrap;
 }
 
 .download-btn:hover {
@@ -137,7 +322,6 @@
 .main-content {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 8rem 2rem 4rem;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 4rem;
@@ -150,6 +334,8 @@
   flex-direction: column;
   gap: 1rem;
   padding-top: 8rem;
+   align-items: center; /* 子元素水平居中 */
+  text-align: center;  /* 文本内容居中 */
 }
 
 .logo {
@@ -176,7 +362,7 @@
 }
 
 .headline {
-  font-size: 3.5rem;
+  font-size: 2.5rem;
   font-weight: 700;
   line-height: 1.2;
   margin: 0;
@@ -196,7 +382,7 @@
 }
 
 .description {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   line-height: 1.8;
   color: #666;
   margin: 0;
@@ -273,16 +459,17 @@
 
 .channels-grid {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 1.5rem;
   align-items: center;
+  width: 100%;
 }
 
 .channel-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 60px;
+  justify-content: space-around;
+  width: 250px;
   height: 60px;
   border-radius: 12px;
   background: #fff;
@@ -290,6 +477,8 @@
   transition: all 0.3s ease;
   text-decoration: none;
   overflow: hidden;
+  padding: 0 1rem;
+  gap: 0.75rem;
 }
 
 .channel-item:hover {
@@ -298,10 +487,10 @@
 }
 
 .channel-item img {
-  width: 100%;
-  height: 100%;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
-  padding: 8px;
+  flex-shrink: 0;
 }
 
 .channel-item-local {
@@ -322,6 +511,118 @@
 
 .channel-item-local:hover {
   background: linear-gradient(135deg, #096dd9 0%, #0050b3 100%);
+}
+/* 下载渠道文字样式 - 渐变色增强版 */
+.channel-text {
+  /* 基础字体样式 */
+  font-size: 6rem;
+  font-weight: 700;
+  white-space: nowrap; /* 文字不换行，保证一行显示 */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; /* 和页面字体统一 */
+  
+  /* 文字细节优化 */
+  letter-spacing: 0.02em; /* 轻微字间距，提升可读性 */
+  line-height: 1; /* 行高和字体大小一致，垂直居中更精准 */
+  
+  /* 渐变色文字效果 */
+  background: linear-gradient(135deg, #1890ff 0%, #4CAF50 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent; /* 兼容性回退 */
+  
+  /* 抗锯齿，文字更清晰 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  /* 平滑过渡效果 */
+  transition: all 0.3s ease;
+}
+
+/* hover 状态文字样式 - 渐变色增强 */
+.channel-item:hover .channel-text {
+  /* hover时渐变颜色更鲜艳，对比度增强 */
+  background: linear-gradient(135deg, #096dd9 0%, #2e7d32 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  font-weight: 600; /* hover时加粗，增强交互反馈 */
+  transform: scale(1.05); /* 轻微放大，增强视觉反馈 */
+}
+
+/* 响应式适配 - 平板端 */
+@media (max-width: 1024px) and (min-width: 641px) {
+  .channels-grid {
+    gap: 1.25rem;
+    width: 100%;
+    align-items: center;
+  }
+
+  .channel-item {
+    width: 280px;
+    height: 58px;
+    padding: 0 1.25rem;
+    gap: 0.875rem;
+  }
+
+  .channel-item img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .channel-text {
+    font-size: 0.9rem;
+    /* 保持渐变效果，调整渐变角度以适应较小文字 */
+    background: linear-gradient(135deg, #1890ff 0%, #4CAF50 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  
+  .channel-item:hover .channel-text {
+    background: linear-gradient(135deg, #096dd9 0%, #2e7d32 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+}
+
+/* 响应式适配 - 手机端 */
+@media (max-width: 640px) {
+  .channel-text {
+    font-size: 1.2rem; /* 手机端文字缩小，适配小屏幕 */
+    /* 手机端使用更简洁的渐变，确保小字体下清晰可见 */
+    background: linear-gradient(135deg, #1890ff 0%, #4CAF50 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  
+  .channel-item:hover .channel-text {
+    background: linear-gradient(135deg, #096dd9 0%, #2e7d32 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    transform: scale(1.03); /* 手机端缩小放大比例 */
+  }
+}
+
+/* 桌面端大屏适配 - 增强渐变效果 */
+@media (min-width: 1201px) {
+  .channel-text {
+    font-size: 1.5rem;
+    /* 大屏使用更丰富的渐变效果 */
+    background: linear-gradient(135deg, #1890ff 0%, #40a9ff 50%, #4CAF50 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  
+  .channel-item:hover .channel-text {
+    background: linear-gradient(135deg, #096dd9 0%, #1890ff 50%, #2e7d32 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
 }
 
 /* 右侧手机展示 */
@@ -346,6 +647,16 @@
   filter: drop-shadow(0 25px 45px rgba(0, 0, 0, 0.2));
 }
 
+/* 文字切换过渡效果 */
+.headline-part-2,
+.description,
+.channels-title,
+.channel-text,
+.download-btn,
+.language-btn {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
 /* 响应式设计 */
 @media (max-width: 968px) {
   .main-content {
@@ -359,6 +670,16 @@
     padding-top: 0; /* 可选：去掉文字区域的顶部padding，适配手机端 */
   }
 
+  .download-channels {
+    width: 100%;
+    margin-top: 4rem;
+  }
+
+  .channels-grid {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
 
   .phone-mockup {
     max-width: 100%;
@@ -385,6 +706,21 @@
   .nav-link {
     font-size: 0.85rem;
   }
+
+  .nav-actions {
+    gap: 0.75rem;
+  }
+
+  .language-btn {
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    min-width: 60px;
+  }
+
+  .download-btn {
+    padding: 0.4rem 1.2rem;
+    font-size: 0.85rem;
+  }
 }
 
 @media (max-width: 640px) {
@@ -394,11 +730,21 @@
 
   .channels-grid {
     gap: 1rem;
+    width: 100%;
+    align-items: stretch;
   }
 
   .channel-item {
-    width: 50px;
-    height: 50px;
+    width: 100%;
+    max-width: 100%;
+    height: 56px;
+    padding: 0 1rem;
+    gap: 0.75rem;
+  }
+
+  .channel-item img {
+    width: 36px;
+    height: 36px;
   }
 
   .channel-item-local {
@@ -412,6 +758,35 @@
 
   .nav-links {
     display: none;
+  }
+
+  .nav-container {
+    padding: 0 1rem;
+    gap: 1rem;
+  }
+
+  .nav-actions {
+    gap: 0.5rem;
+  }
+
+  .language-btn {
+    padding: 0.35rem 0.8rem;
+    font-size: 0.8rem;
+    min-width: 55px;
+  }
+
+  .download-btn {
+    padding: 0.35rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .logo-text {
+    font-size: 20px;
+  }
+
+  .logo-icon {
+    width: 40px;
+    height: 40px;
   }
 }
 
@@ -432,13 +807,104 @@
   }
   .channels-grid {
     gap: 1rem;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .channel-item {
+    width: 100%;
+    max-width: 100%;
   }
 }
 
 /* 桌面端大屏适配（例如：> 1200px） */
 @media (min-width: 1201px) {
   .main-content {
-    max-width: 1800px;
+    max-width: 800px;
+  }
+}
+
+/* 引导提示条样式 */
+.guide-tip {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.guide-tip-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.guide-tip-text {
+  flex: 1;
+  color: #fff;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.guide-tip-arrow {
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+/* 手机端样式 */
+@media (max-width: 767px) {
+  .guide-tip {
+    padding: 0.8rem 1rem;
+  }
+
+  .guide-tip-text {
+    font-size: 0.85rem;
+  }
+
+  .guide-tip-arrow {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* 平板端样式 */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .guide-tip {
+    padding: 0.9rem 1.2rem;
+  }
+
+  .guide-tip-text {
+    font-size: 0.95rem;
+  }
+
+  .guide-tip-arrow {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* 桌面端隐藏提示条 */
+@media (min-width: 1024px) {
+  .guide-tip {
+    display: none !important;
   }
 }
 </style>
