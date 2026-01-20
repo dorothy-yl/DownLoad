@@ -19,13 +19,18 @@ export const translations = {
     huawei: '华为下载',
     google: '谷歌下载',
     samsung: '三星下载',
+    ios: 'iOS下载',
+    local: '本地下载',
     
     // 语言切换按钮
     language: '中文',
     switchTo: 'English',
     
     // 引导提示文案
-    guideTip: '点击右上角按钮，然后在弹出的菜单中，点击"在浏览器中打开"或者点击"复制链接"在浏览器中打开，即可安装'
+    guideTip: '点击右上角按钮，然后在弹出的菜单中，点击"在浏览器中打开"或者点击"复制链接"在浏览器中打开，即可安装',
+    
+    // 弹窗提示
+    notAvailable: '暂未开放'
   },
   en: {
     // Navigation
@@ -46,13 +51,18 @@ export const translations = {
     huawei: 'Download from Huawei',
     google: 'Download from Google Play',
     samsung: 'Download from Samsung',
+    ios: 'Download from iOS',
+    local: 'Local Download',
     
     // Language switch button
     language: 'English',
     switchTo: '中文',
     
     // Guide tip text
-    guideTip: 'Click the button in the upper right corner, then in the pop-up menu, click "Open in browser" or click "Copy link" to open in browser, then you can install'
+    guideTip: 'Click the button in the upper right corner, then in the pop-up menu, click "Open in browser" or click "Copy link" to open in browser, then you can install',
+    
+    // Modal tip
+    notAvailable: 'Not Available Yet'
   }
 }
 

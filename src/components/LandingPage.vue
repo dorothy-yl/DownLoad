@@ -18,7 +18,7 @@
           <button class="download-btn">{{ t.download }}</button>
         </div>
       </div>
-    </nav>
+
 
     <!-- 引导提示条 -->
     <div 
@@ -30,6 +30,18 @@
       <div class="guide-tip-content">
         <span class="guide-tip-text">{{ t.guideTip }}</span>
         <img src="@/image/不规则箭头-右上.svg" alt="arrow" class="guide-tip-arrow" />
+      </div>
+    </div>
+
+    </nav>
+
+    <!-- iOS下载弹窗 -->
+    <div v-if="showIOSModal" class="modal-overlay" @click="closeIOSModal">
+      <div class="modal-content" @click.stop>
+        <div class="modal-body">
+          <p class="modal-text">{{ t.notAvailable }}</p>
+        </div>
+        <button class="modal-close-btn" @click="closeIOSModal">确定</button>
       </div>
     </div>
 
@@ -55,6 +67,7 @@
           <h3 class="channels-title">{{ t.downloadOptions }}</h3>
           <div class="channels-grid">
             <a 
+              v-if="false"
               href="#" 
               class="channel-item" 
               :title="t.yingyongbao"
@@ -65,6 +78,7 @@
               <span class="channel-text">{{ t.yingyongbao }}</span>
             </a>
             <a 
+              v-if="false"
               href="#" 
               class="channel-item" 
               :title="t.xiaomi"
@@ -75,6 +89,7 @@
                <span class="channel-text">{{ t.xiaomi }}</span>
             </a>
             <a 
+              v-if="false"
               href="#" 
               class="channel-item" 
               :title="t.huawei"
@@ -96,6 +111,27 @@
                <span class="channel-text">{{ t.google }}</span>
             </a>
             <a 
+              href="#" 
+              class="channel-item" 
+              :title="t.ios"
+              :ref="el => setChannelRef(el, 'ios')"
+              @click.prevent="handleChannelClick('ios', $event)"
+            >
+              <img src="@/image/ios下载.svg" :alt="t.ios" />
+               <span class="channel-text">{{ t.ios }}</span>
+            </a>
+            <a 
+              href="#" 
+              class="channel-item" 
+              :title="t.local"
+              :ref="el => setChannelRef(el, 'local')"
+              @click.prevent="handleChannelClick('local', $event)"
+            >
+              <img src="@/image/本地下载.svg" :alt="t.local" />
+               <span class="channel-text">{{ t.local }}</span>
+            </a>
+            <a 
+              v-if="false"
               href="#" 
               class="channel-item" 
               :title="t.samsung"
@@ -144,6 +180,9 @@ const guideTipStyle = ref({})
 const autoHideTimer = ref(null)
 const channelRefs = ref({})
 
+// iOS弹窗状态
+const showIOSModal = ref(false)
+
 // 设置渠道按钮引用
 const setChannelRef = (el, channelName) => {
   if (el) {
@@ -153,6 +192,12 @@ const setChannelRef = (el, channelName) => {
 
 // 处理渠道按钮点击
 const handleChannelClick = async (channelName, event) => {
+  // 如果是iOS下载且在手机端或平板端，显示弹窗
+  if (channelName === 'ios' && (isMobile.value || isTablet.value)) {
+    showIOSModal.value = true
+    return
+  }
+
   // 仅在手机端和平板端显示提示条
   if (!isMobile.value && !isTablet.value) {
     return
@@ -176,6 +221,11 @@ const handleChannelClick = async (channelName, event) => {
     showGuideTip.value = false
     autoHideTimer.value = null
   }, 5000)
+}
+
+// 关闭iOS弹窗
+const closeIOSModal = () => {
+  showIOSModal.value = false
 }
 
 // 更新提示条位置 - 固定在导航栏下方
@@ -825,10 +875,9 @@ onUnmounted(() => {
 
 /* 引导提示条样式 */
 .guide-tip {
-  position: fixed;
-  left: 0;
-  right: 0;
-  z-index: 999;
+ width: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
   background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(10px);
   cursor: pointer;
@@ -905,6 +954,109 @@ onUnmounted(() => {
 @media (min-width: 1024px) {
   .guide-tip {
     display: none !important;
+  }
+}
+
+/* iOS下载弹窗样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 320px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-body {
+  width: 100%;
+  text-align: center;
+}
+
+.modal-text {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.modal-close-btn {
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 8px;
+  background: #1890ff;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.modal-close-btn:hover {
+  background: #096dd9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+}
+
+.modal-close-btn:active {
+  transform: translateY(0);
+}
+
+/* 手机端弹窗样式 */
+@media (max-width: 640px) {
+  .modal-content {
+    padding: 1.5rem;
+    max-width: 280px;
+  }
+
+  .modal-text {
+    font-size: 1.1rem;
+  }
+
+  .modal-close-btn {
+    padding: 0.65rem 1.5rem;
+    font-size: 0.95rem;
   }
 }
 </style>
