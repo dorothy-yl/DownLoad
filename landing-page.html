@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>I-consolePro - 智能健身, 科学训练</title>
+  <style>
+    /* 全局样式重置 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .landing-page {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #e8f4f8 0%, #d0e8f0 100%);
+      padding: 0;
+    }
+
+    /* 顶部导航栏 */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      padding: 1rem 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-container {
+      max-width: 1800px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-left: auto;
+    }
+
+    .language-btn {
+      padding: 0.5rem 1.2rem;
+      border: 2px solid #666;
+      border-radius: 25px;
+      background: #fff;
+      color: #666;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      min-width: 70px;
+    }
+
+    .language-btn:hover {
+      border-color: #1890ff;
+      color: #1890ff;
+      background: rgba(24, 144, 255, 0.05);
+      transform: translateY(-2px);
+    }
+
+    .download-btn {
+      padding: 0.5rem 1.5rem;
+      border: 2px solid #1890ff;
+      border-radius: 25px;
+      background: transparent;
+      color: #1890ff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .download-btn:hover {
+      background: #1890ff;
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+    }
+
+    .logo {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.75rem;
+    }
+
+    .logo-icon {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+    }
+
+    .logo-text {
+      font-size: 24px;
+      font-weight: bold;
+      background: linear-gradient(to right, #2196F3, #4CAF50);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    /* 主内容区域 */
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 8rem 2rem 3rem;
+    }
+
+    /* 左侧内容 */
+    .left-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+      text-align: center;
+    }
+
+    .headline {
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin: 0;
+      color: #1890ff;
+      letter-spacing: 0.10em;
+    }
+
+    .description {
+      font-size: 1.3rem;
+      line-height: 1.8;
+      color: #666;
+      margin: 0;
+      max-width: 500px;
+    }
+
+    /* 下载渠道区域 */
+    .download-channels {
+      margin-top: 6rem;
+    }
+
+    .channels-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #333;
+      margin: 0 0 1.5rem 0;
+    }
+
+    .channels-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      align-items: center;
+      width: 100%;
+    }
+
+    .channel-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      width: 250px;
+      height: 60px;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      text-decoration: none;
+      overflow: hidden;
+      padding: 0 1rem;
+      gap: 0.75rem;
+      cursor: pointer;
+    }
+
+    .channel-item:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .channel-item img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .channel-text {
+      font-size: 1rem;
+      font-weight: 700;
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+      line-height: 1;
+      background: linear-gradient(135deg, #1890ff 0%, #4CAF50 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      transition: all 0.3s ease;
+    }
+
+    .channel-item:hover .channel-text {
+      background: linear-gradient(135deg, #096dd9 0%, #2e7d32 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      transform: scale(1.05);
+    }
+
+    /* 引导提示条样式 */
+    .guide-tip {
+      position: fixed;
+      left: 0;
+      right: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      animation: slideDown 0.3s ease;
+      z-index: 1500;
+      padding: 0.8rem 1rem;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .guide-tip-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    .guide-tip-text {
+      flex: 1;
+      color: #fff;
+      line-height: 1.5;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+
+    .guide-tip-arrow {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+
+    /* iOS下载弹窗样式 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .modal-content {
+      background: #fff;
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 320px;
+      width: 90%;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      animation: slideUp 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-body {
+      width: 100%;
+      text-align: center;
+    }
+
+    .modal-text {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: #333;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .modal-close-btn {
+      padding: 0.75rem 2rem;
+      border: none;
+      border-radius: 8px;
+      background: #1890ff;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 100px;
+    }
+
+    .modal-close-btn:hover {
+      background: #096dd9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 968px) {
+      .main-content {
+        padding: 6rem 1.5rem 3rem;
+      }
+
+      .headline {
+        font-size: 2rem;
+      }
+
+      .description {
+        font-size: 1rem;
+      }
+
+      .nav-container {
+        padding: 0 1.5rem;
+      }
+
+      .language-btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+        min-width: 60px;
+      }
+
+      .download-btn {
+        padding: 0.4rem 1.2rem;
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .headline {
+        font-size: 2rem;
+      }
+
+      .channels-grid {
+        gap: 1rem;
+        width: 100%;
+        align-items: stretch;
+      }
+
+      .channel-item {
+        width: 100%;
+        max-width: 100%;
+        height: 56px;
+        padding: 0 1rem;
+        gap: 0.75rem;
+      }
+
+      .channel-item img {
+        width: 36px;
+        height: 36px;
+      }
+
+      .channel-text {
+        font-size: 1rem;
+      }
+
+      .nav-container {
+        padding: 0 1rem;
+        gap: 1rem;
+      }
+
+      .nav-actions {
+        gap: 0.5rem;
+      }
+
+      .language-btn {
+        padding: 0.35rem 0.8rem;
+        font-size: 0.8rem;
+        min-width: 55px;
+      }
+
+      .download-btn {
+        padding: 0.35rem 1rem;
+        font-size: 0.8rem;
+      }
+
+      .logo-text {
+        font-size: 20px;
+      }
+
+      .logo-icon {
+        width: 40px;
+        height: 40px;
+      }
+
+      .modal-content {
+        padding: 1.5rem;
+        max-width: 280px;
+      }
+
+      .modal-text {
+        font-size: 1.1rem;
+      }
+
+      .modal-close-btn {
+        padding: 0.65rem 1.5rem;
+        font-size: 0.95rem;
+      }
+    }
+
+    /* 桌面端隐藏提示条 */
+    @media (min-width: 1024px) {
+      .guide-tip {
+        display: none !important;
+      }
+    }
+
+    /* 平板端样式 */
+    @media (min-width: 768px) and (max-width: 1023px) {
+      .guide-tip {
+        padding: 0.9rem 1.2rem;
+      }
+
+      .guide-tip-text {
+        font-size: 0.95rem;
+      }
+
+      .guide-tip-arrow {
+        width: 28px;
+        height: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="landing-page">
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <!-- Logo -->
+        <div class="logo">
+          <img src="src/image/爱心.svg" alt="I-consolePro" class="logo-icon" />
+          <span class="logo-text">I-consolePro</span>
+        </div>
+        <div class="nav-actions">
+          <!-- 语言切换按钮 -->
+          <button class="language-btn" id="languageBtn" title="English">中文</button>
+          <button class="download-btn" id="downloadBtn">下载</button>
+        </div>
+      </div>
+
+      <!-- 引导提示条 -->
+      <div id="guideTip" class="guide-tip" style="display: none;">
+        <div class="guide-tip-content">
+          <span class="guide-tip-text" id="guideTipText">点击右上角按钮，然后在弹出的菜单中，点击"在浏览器中打开"或者点击"复制链接"在浏览器中打开，即可安装</span>
+          <img src="src/image/不规则箭头-右上.svg" alt="arrow" class="guide-tip-arrow" />
+        </div>
+      </div>
+    </nav>
+
+    <!-- iOS下载弹窗 -->
+    <div id="iosModal" class="modal-overlay">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-body">
+          <p class="modal-text" id="modalText">暂未开放</p>
+        </div>
+        <button class="modal-close-btn" id="modalCloseBtn">确定</button>
+      </div>
+    </div>
+
+    <!-- 主内容区域 -->
+    <div class="main-content">
+      <!-- 左侧内容 -->
+      <div class="left-section">
+        <!-- 标题 -->
+        <h1 class="headline" id="headline">智能健身,科学训练</h1>
+
+        <!-- 描述文字 -->
+        <p class="description" id="description">
+          I-consolePro 是您的私人健身教练,通过AI技术为您提供个性化训练计划,实时数据监测,让健身更高效、更有趣。
+        </p>
+
+        <!-- 下载渠道列表 -->
+        <div class="download-channels">
+          <h3 class="channels-title" id="channelsTitle">下载方式</h3>
+          <div class="channels-grid">
+            <a href="#" class="channel-item" data-channel="google" onclick="handleChannelClick('google', event)">
+              <img src="src/image/谷歌.svg" alt="Google" />
+              <span class="channel-text" id="googleText">谷歌下载</span>
+            </a>
+            <a href="#" class="channel-item" data-channel="ios" onclick="handleChannelClick('ios', event)">
+              <img src="src/image/ios下载.svg" alt="iOS" />
+              <span class="channel-text" id="iosText">iOS下载</span>
+            </a>
+            <a href="#" class="channel-item" data-channel="local" onclick="handleChannelClick('local', event)">
+              <img src="src/image/本地下载.svg" alt="Local" />
+              <span class="channel-text" id="localText">本地下载</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 多语言配置
+    const translations = {
+      zh: {
+        download: '下载',
+        headline: '智能健身,科学训练',
+        description: 'I-consolePro 是您的私人健身教练,通过AI技术为您提供个性化训练计划,实时数据监测,让健身更高效、更有趣。',
+        downloadOptions: '下载方式',
+        google: '谷歌下载',
+        ios: 'iOS下载',
+        local: '本地下载',
+        language: '中文',
+        switchTo: 'English',
+        guideTip: '点击右上角按钮，然后在弹出的菜单中，点击"在浏览器中打开"或者点击"复制链接"在浏览器中打开，即可安装',
+        notAvailable: '暂未开放'
+      },
+      en: {
+        download: 'Download',
+        headline: 'Smart Fitness, Scientific Training',
+        description: 'I-consolePro is your personal fitness trainer, providing personalized training plans through AI technology, real-time data monitoring, making fitness more efficient and fun.',
+        downloadOptions: 'Download Options',
+        google: 'Download from Google Play',
+        ios: 'Download from iOS',
+        local: 'Local Download',
+        language: 'English',
+        switchTo: '中文',
+        guideTip: 'Click the button in the upper right corner, then in the pop-up menu, click "Open in browser" or click "Copy link" to open in browser, then you can install',
+        notAvailable: 'Not Available Yet'
+      }
+    };
+
+    // 获取当前语言
+    function getLanguage() {
+      const savedLang = localStorage.getItem('app-language');
+      return savedLang && (savedLang === 'zh' || savedLang === 'en') ? savedLang : 'zh';
+    }
+
+    // 设置语言
+    function setLanguage(lang) {
+      if (lang === 'zh' || lang === 'en') {
+        localStorage.setItem('app-language', lang);
+      }
+    }
+
+    // 当前语言状态
+    let currentLang = getLanguage();
+
+    // 更新页面文本
+    function updateTexts() {
+      const t = translations[currentLang];
+      
+      document.getElementById('downloadBtn').textContent = t.download;
+      document.getElementById('headline').textContent = t.headline;
+      document.getElementById('description').textContent = t.description;
+      document.getElementById('channelsTitle').textContent = t.downloadOptions;
+      document.getElementById('googleText').textContent = t.google;
+      document.getElementById('iosText').textContent = t.ios;
+      document.getElementById('localText').textContent = t.local;
+      document.getElementById('languageBtn').textContent = t.language;
+      document.getElementById('languageBtn').title = t.switchTo;
+      document.getElementById('guideTipText').textContent = t.guideTip;
+      document.getElementById('modalText').textContent = t.notAvailable;
+    }
+
+    // 切换语言
+    function toggleLanguage() {
+      currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      setLanguage(currentLang);
+      updateTexts();
+    }
+
+    // 判断设备类型
+    function isMobile() {
+      return window.innerWidth < 768;
+    }
+
+    function isTablet() {
+      return window.innerWidth >= 768 && window.innerWidth < 1024;
+    }
+
+    function isDesktop() {
+      return window.innerWidth >= 1024;
+    }
+
+    // 提示条相关
+    let autoHideTimer = null;
+
+    // 更新提示条位置
+    function updateGuideTipPosition() {
+      const navbar = document.querySelector('.navbar');
+      const guideTip = document.getElementById('guideTip');
+      if (navbar && guideTip) {
+        const navbarHeight = navbar.offsetHeight;
+        guideTip.style.top = `${navbarHeight}px`;
+      }
+    }
+
+    // 显示提示条
+    function showGuideTip() {
+      if (isDesktop()) {
+        return;
+      }
+      
+      const guideTip = document.getElementById('guideTip');
+      updateGuideTipPosition();
+      guideTip.style.display = 'block';
+      
+      // 清除之前的定时器
+      if (autoHideTimer) {
+        clearTimeout(autoHideTimer);
+      }
+      
+      // 5秒后自动隐藏
+      autoHideTimer = setTimeout(() => {
+        guideTip.style.display = 'none';
+        autoHideTimer = null;
+      }, 5000);
+    }
+
+    // 关闭提示条
+    function closeGuideTip() {
+      const guideTip = document.getElementById('guideTip');
+      guideTip.style.display = 'none';
+      if (autoHideTimer) {
+        clearTimeout(autoHideTimer);
+        autoHideTimer = null;
+      }
+    }
+
+    // iOS弹窗
+    function showIOSModal() {
+      const modal = document.getElementById('iosModal');
+      modal.classList.add('show');
+    }
+
+    function closeIOSModal() {
+      const modal = document.getElementById('iosModal');
+      modal.classList.remove('show');
+    }
+
+    // 处理渠道按钮点击
+    function handleChannelClick(channelName, event) {
+      event.preventDefault();
+      
+      // 如果是iOS下载且在手机端或平板端，显示弹窗
+      if (channelName === 'ios' && (isMobile() || isTablet())) {
+        showIOSModal();
+        return;
+      }
+
+      // 仅在手机端和平板端显示提示条
+      if (!isMobile() && !isTablet()) {
+        return;
+      }
+
+      showGuideTip();
+    }
+
+    // 监听窗口大小变化
+    function handleResize() {
+      if (isDesktop()) {
+        closeGuideTip();
+      } else {
+        updateGuideTipPosition();
+      }
+    }
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', function() {
+      // 更新文本
+      updateTexts();
+      
+      // 绑定事件
+      document.getElementById('languageBtn').addEventListener('click', toggleLanguage);
+      document.getElementById('guideTip').addEventListener('click', closeGuideTip);
+      document.getElementById('modalCloseBtn').addEventListener('click', closeIOSModal);
+      document.getElementById('iosModal').addEventListener('click', closeIOSModal);
+      
+      // 监听窗口大小变化
+      window.addEventListener('resize', handleResize);
+    });
+  </script>
+</body>
+</html>
